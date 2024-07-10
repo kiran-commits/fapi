@@ -1,70 +1,50 @@
 import React, { useState, useEffect } from 'react';
 
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState(null);
+function GetRequest() {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const facebookAppId = '114309750695303';  // Replace with your App ID
+  const targetUrl = "https://graph.facebook.com/v20.0/me?fields=id%2Cname&access_token=EAAQPpCDYd0YBO0ObbCZCScOi4YrAv71vT3JT5ykCpZC2p5JJLVvvSSmqmUtVEfeWkPvuvaPbLK8HRlMWDaWLXPXuhDdcOIUu6DtOsK9CrilGHvs5y5iOfJeIjMYTLFix1ViBuoMwqM9Oy33GPGxGkbZCTDpOEshDKtdaNpJxqM291jdCs5HSa4dXIAIfb2MlOz7f0JKfBS0ZAhiZB46tIZBW8RdgZDZD"; // Replace with your desired URL
 
   useEffect(() => {
-    window.fbAsyncInit = function() {
-      FB.init({
-        appId      : facebookAppId,
-        cookie     : true,  // Enable cookies for session management
-        xfbml      : true,  // Parse social plugins on this page
-        version    : 'v2.13' // Use Facebook SDK v2
-      });
-
-      // Check login status on page load
-      FB.getLoginStatus(function(response) {
-        statusChangeCallback(response);
-      });
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(targetUrl);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        const data = await response.text();
+        setData(data);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    (function(d, s, id){
-       var js, fjs = d.getElementsByTagName(s)[0];
-       if (d.getElementById(id)) { return; }
-       js = d.createElement(s); js.id = id;
-       js.src = "https://connect.facebook.net/en_US/sdk.js";
-       fjs.parentNode.insertBefore(js, fjs);
-     }(document, 'script', 'facebook-jssdk'));
+    fetchData();
   }, []);
 
-  const statusChangeCallback = (response) => {
-    console.log('statusChangeCallback', response);
-    const isLoggedIn = response.status === 'connected';
-    setIsLoggedIn(isLoggedIn);
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
 
-    if (isLoggedIn) {
-      // Assuming user is already logged in
-      const accessToken = response.authResponse.accessToken;
-      fetchUserData(accessToken);
-    }
-  };
+  if (error) {
+    return <p>Error: {error.message}</p>;
+  }
 
-  const fetchUserData = (accessToken) => {
-    FB.api('/me?fields=name,email&access_token=' + accessToken, (response) => {
-      if (!response.error) {
-        setUserData(response);
-      } else {
-        console.error('Error fetching user data:', response.error);
-      }
-    });
-  };
+  if (data) {
+    return (
+      <div>
+        <p>API Response:</p>
+        <pre>{data}</pre>
+      </div>
+    );
+  }
 
-  // ... rest of your code
-
-  return (
-    <div className="App">
-      {/* Your login button implementation (if needed) */}
-      {isLoggedIn && (
-        <div>
-          <h1>Welcome {userData?.name}</h1>
-          {/* Your code to display user data */}
-        </div>
-      )}
-    </div>
-  );
+  return null;
 }
 
-export default App;
+export default GetRequest;
