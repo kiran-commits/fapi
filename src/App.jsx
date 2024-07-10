@@ -4,18 +4,17 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
 
-  const facebookAppId = '114309750695303';  // Replace with your App ID
+  const facebookAppId = '114309750695303';  
 
   useEffect(() => {
     window.fbAsyncInit = function() {
       FB.init({
         appId      : facebookAppId,
-        cookie     : true,  // Enable cookies for session management
-        xfbml      : true,  // Parse social plugins on this page
-        version    : 'v2.13' // Use Facebook SDK v2
+        cookie     : true,  
+        xfbml      : true,  
+        version    : 'v2.13' 
       });
 
-      // Check login status on page load
       FB.getLoginStatus(function(response) {
         statusChangeCallback(response);
       });
@@ -36,7 +35,6 @@ function App() {
     setIsLoggedIn(isLoggedIn);
 
     if (isLoggedIn) {
-      // Assuming user is already logged in
       const accessToken = response.authResponse.accessToken;
       fetchUserData(accessToken);
     }
@@ -52,15 +50,14 @@ function App() {
     });
   };
 
-  // ... rest of your code
 
   return (
     <div className="App">
-      {/* Your login button implementation (if needed) */}
+      {}
       {isLoggedIn && (
         <div>
           <h1>Welcome {userData?.name}</h1>
-          {/* Your code to display user data */}
+          {}
         </div>
       )}
     </div>
